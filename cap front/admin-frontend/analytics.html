@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics | Captains-Signature Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
+</head>
+<body class="admin-body">
+    <!-- Admin Navigation -->
+    <nav class="admin-navbar">
+        <div class="admin-nav-container">
+            <div class="admin-nav-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="index.html" class="admin-logo">
+                    <img src="assets/images/logo.png" alt="Captains-Signature">
+                    <span>Admin</span>
+                </a>
+            </div>
+            <div class="admin-nav-right">
+                <div class="admin-search">
+                    <input type="text" placeholder="Search analytics...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+                <div class="admin-notifications">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </button>
+                </div>
+                <div class="admin-profile" id="profileDropdown">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=1a1a1a&color=fff" alt="Admin">
+                    <span>Admin User</span>
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="dropdown-menu" id="profileMenu">
+                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-menu">
+            <div class="sidebar-header">
+                <h3>Dashboard</h3>
+            </div>
+            <ul class="sidebar-links">
+                <li>
+                    <a href="index.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Orders</span>
+                        <span class="badge">12</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="products.html">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="customers.html">
+                        <i class="fas fa-users"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="inventory.html">
+                        <i class="fas fa-boxes"></i>
+                        <span>Inventory</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="analytics.html">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="settings.html">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../index.html" class="store-front">
+                    <i class="fas fa-store"></i>
+                    <span>Store Front</span>
+                </a>
+                <a href="#" class="logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main" id="adminMain">
+        <div class="admin-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Analytics Dashboard</h1>
+                <div class="header-actions">
+                    <div class="date-range-selector">
+                        <button class="date-range-btn active" data-range="7">Last 7 Days</button>
+                        <button class="date-range-btn" data-range="30">Last 30 Days</button>
+                        <button class="date-range-btn" data-range="90">Last 90 Days</button>
+                        <button class="date-range-btn" data-range="365">This Year</button>
+                        <button class="date-range-btn custom" onclick="openCustomDateRange()">
+                            <i class="fas fa-calendar"></i> Custom
+                        </button>
+                    </div>
+                    <button class="btn-primary" onclick="exportAnalytics()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon revenue">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Total Revenue</h3>
+                        <div class="kpi-value" id="totalRevenue">₦0.00</div>
+                        <div class="kpi-trend up" id="revenueTrend">
+                            <i class="fas fa-arrow-up"></i> 12.5%
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon orders">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Total Orders</h3>
+                        <div class="kpi-value" id="totalOrders">0</div>
+                        <div class="kpi-trend up" id="ordersTrend">
+                            <i class="fas fa-arrow-up"></i> 8.2%
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon customers">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Customers</h3>
+                        <div class="kpi-value" id="totalCustomers">0</div>
+                        <div class="kpi-trend up" id="customersTrend">
+                            <i class="fas fa-arrow-up"></i> 5.7%
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon conversion">
+                        <i class="fas fa-percent"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Conversion Rate</h3>
+                        <div class="kpi-value" id="conversionRate">0%</div>
+                        <div class="kpi-trend up" id="conversionTrend">
+                            <i class="fas fa-arrow-up"></i> 2.1%
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon cart">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Avg. Order Value</h3>
+                        <div class="kpi-value" id="avgOrderValue">₦0.00</div>
+                        <div class="kpi-trend down" id="aovTrend">
+                            <i class="fas fa-arrow-down"></i> 1.3%
+                        </div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon satisfaction">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="kpi-content">
+                        <h3>Customer Satisfaction</h3>
+                        <div class="kpi-value" id="customerSatisfaction">4.8/5</div>
+                        <div class="kpi-trend up" id="satisfactionTrend">
+                            <i class="fas fa-arrow-up"></i> 0.2%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Revenue & Orders Chart -->
+            <div class="analytics-grid">
+                <div class="analytics-card full-width">
+                    <div class="card-header">
+                        <h3>Revenue & Orders Overview</h3>
+                        <div class="chart-legend">
+                            <span class="legend-item">
+                                <span class="color-dot revenue"></span> Revenue
+                            </span>
+                            <span class="legend-item">
+                                <span class="color-dot orders"></span> Orders
+                            </span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueOrdersChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product & Category Analytics -->
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3>Sales by Category</h3>
+                        <div class="card-actions">
+                            <select id="categoryPeriod" onchange="loadCategorySales()">
+                                <option value="7">Last 7 Days</option>
+                                <option value="30" selected>Last 30 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container donut-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                    <div class="category-stats-list" id="categoryStatsList">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3>Top Selling Products</h3>
+                        <div class="card-actions">
+                            <a href="products.html" class="view-link">View All</a>
+                        </div>
+                    </div>
+                    <div class="top-products-list" id="topProductsList">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer & Geographic Analytics -->
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3>Customer Acquisition</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="customerAcquisitionChart"></canvas>
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3>Top States by Orders</h3>
+                    </div>
+                    <div class="geo-stats-list" id="geoStatsList">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sales Funnel -->
+            <div class="analytics-grid">
+                <div class="analytics-card full-width">
+                    <div class="card-header">
+                        <h3>Sales Funnel</h3>
+                    </div>
+                    <div class="funnel-container">
+                        <div class="funnel-stage">
+                            <div class="stage-label">
+                                <span>Visitors</span>
+                                <span class="stage-count" id="visitorCount">12,345</span>
+                            </div>
+                            <div class="stage-bar" style="width: 100%">
+                                <span class="stage-percentage">100%</span>
+                            </div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="stage-label">
+                                <span>Product Views</span>
+                                <span class="stage-count" id="productViewCount">8,024</span>
+                            </div>
+                            <div class="stage-bar" style="width: 65%">
+                                <span class="stage-percentage">65%</span>
+                            </div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="stage-label">
+                                <span>Add to Cart</span>
+                                <span class="stage-count" id="addToCartCount">4,812</span>
+                            </div>
+                            <div class="stage-bar" style="width: 39%">
+                                <span class="stage-percentage">39%</span>
+                            </div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="stage-label">
+                                <span>Checkout Started</span>
+                                <span class="stage-count" id="checkoutCount">2,406</span>
+                            </div>
+                            <div class="stage-bar" style="width: 20%">
+                                <span class="stage-percentage">20%</span>
+                            </div>
+                        </div>
+                        <div class="funnel-stage">
+                            <div class="stage-label">
+                                <span>Completed Orders</span>
+                                <span class="stage-count" id="completedOrderCount">1,482</span>
+                            </div>
+                            <div class="stage-bar" style="width: 12%">
+                                <span class="stage-percentage">12%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment & Device Analytics -->
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3>Payment Methods</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                    <div class="payment-stats-list" id="paymentStatsList">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3>Device Breakdown</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="deviceChart"></canvas>
+                    </div>
+                    <div class="device-stats-list" id="deviceStatsList">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Status Distribution -->
+            <div class="analytics-grid">
+                <div class="analytics-card full-width">
+                    <div class="card-header">
+                        <h3>Order Status Distribution</h3>
+                    </div>
+                    <div class="status-bars-container" id="statusDistribution">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Modal -->
+            <div class="modal-overlay" id="exportModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>Export Analytics Report</h3>
+                        <button class="modal-close" onclick="closeModal('exportModal')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="exportForm">
+                            <div class="form-group">
+                                <label for="exportFormat">Format</label>
+                                <select id="exportFormat" name="format">
+                                    <option value="csv">CSV</option>
+                                    <option value="excel">Excel</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="exportDateRange">Date Range</label>
+                                <select id="exportDateRange" name="date_range">
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30">Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                    <option value="365">This Year</option>
+                                    <option value="custom">Custom Range</option>
+                                </select>
+                            </div>
+                            <div class="form-group" id="customDateRangeFields" style="display: none;">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="exportStartDate">Start Date</label>
+                                        <input type="date" id="exportStartDate" name="start_date">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exportEndDate">End Date</label>
+                                        <input type="date" id="exportEndDate" name="end_date">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Include Sections</label>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sections[]" value="revenue" checked>
+                                        Revenue Overview
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sections[]" value="products" checked>
+                                        Product Performance
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sections[]" value="customers" checked>
+                                        Customer Analytics
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="sections[]" value="orders" checked>
+                                        Order Statistics
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="closeModal('exportModal')">Cancel</button>
+                        <button class="btn-primary" onclick="generateReport()">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Date Range Modal -->
+            <div class="modal-overlay" id="customDateModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3>Select Custom Date Range</h3>
+                        <button class="modal-close" onclick="closeModal('customDateModal')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customStartDate">Start Date</label>
+                                <input type="date" id="customStartDate" name="start_date">
+                            </div>
+                            <div class="form-group">
+                                <label for="customEndDate">End Date</label>
+                                <input type="date" id="customEndDate" name="end_date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="closeModal('customDateModal')">Cancel</button>
+                        <button class="btn-primary" onclick="applyCustomDateRange()">Apply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/analytics.js"></script>
+</body>
+</html>

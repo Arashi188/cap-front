@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory | Captains-Signature Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="admin-body">
+    <!-- Admin Navigation -->
+    <nav class="admin-navbar">
+        <div class="admin-nav-container">
+            <div class="admin-nav-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="index.html" class="admin-logo">
+                    <img src="assets/images/logo.png" alt="Captains-Signature">
+                    <span>Admin</span>
+                </a>
+            </div>
+            <div class="admin-nav-right">
+                <div class="admin-search">
+                    <input type="text" id="inventorySearchInput" placeholder="Search inventory...">
+                    <button onclick="searchInventory()"><i class="fas fa-search"></i></button>
+                </div>
+                <div class="admin-notifications">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </button>
+                </div>
+                <div class="admin-profile" id="profileDropdown">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=1a1a1a&color=fff" alt="Admin">
+                    <span>Admin User</span>
+                    <i class="fas fa-chevron-down"></i>
+                    <div class="dropdown-menu" id="profileMenu">
+                        <a href="profile.html"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-menu">
+            <div class="sidebar-header">
+                <h3>Dashboard</h3>
+            </div>
+            <ul class="sidebar-links">
+                <li>
+                    <a href="index.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Overview</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="orders.html">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Orders</span>
+                        <span class="badge">12</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="products.html">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="customers.html">
+                        <i class="fas fa-users"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="inventory.html">
+                        <i class="fas fa-boxes"></i>
+                        <span>Inventory</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="analytics.html">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="settings.html">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <a href="../index.html" class="store-front">
+                    <i class="fas fa-store"></i>
+                    <span>Store Front</span>
+                </a>
+                <a href="#" class="logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main" id="adminMain">
+        <div class="admin-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Inventory Management</h1>
+                <div class="header-actions">
+                    <button class="btn-primary" onclick="bulkUpdateStock()">
+                        <i class="fas fa-edit"></i> Bulk Update
+                    </button>
+                    <button class="btn-secondary" onclick="exportInventory()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+
+            <!-- Inventory Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon total">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalProducts">156</h3>
+                        <p>Total Products</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon in-stock">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="inStockCount">124</h3>
+                        <p>In Stock</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon low-stock">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="lowStockCount">18</h3>
+                        <p>Low Stock</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon out-of-stock">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="outOfStockCount">14</h3>
+                        <p>Out of Stock</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon value">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="inventoryValue">₦0.00</h3>
+                        <p>Inventory Value</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inventory Alerts -->
+            <div class="inventory-alerts">
+                <div class="alert-header">
+                    <h3><i class="fas fa-exclamation-circle"></i> Low Stock Alerts</h3>
+                    <a href="#" onclick="viewAllAlerts()">View All</a>
+                </div>
+                <div class="alerts-grid" id="lowStockAlerts">
+                    <!-- Loaded via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Shoes">Shoes</option>
+                        <option value="Accessories">Accessories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Stock Status</label>
+                    <select id="stockStatusFilter">
+                        <option value="">All Status</option>
+                        <option value="in_stock">In Stock</option>
+                        <option value="low_stock">Low Stock</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortFilter">
+                        <option value="name">Name A-Z</option>
+                        <option value="stock_low">Stock: Low to High</option>
+                        <option value="stock_high">Stock: High to Low</option>
+                        <option value="updated">Recently Updated</option>
+                    </select>
+                </div>
+                <button class="btn-primary" onclick="applyInventoryFilters()">
+                    <i class="fas fa-filter"></i> Apply
+                </button>
+                <button class="btn-secondary" onclick="resetInventoryFilters()">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+
+            <!-- Inventory Table -->
+            <div class="inventory-table-container">
+                <table class="inventory-table">
+                    <thead>
+                        <tr>
+                            <th width="40">
+                                <input type="checkbox" id="selectAllInventory">
+                            </th>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Category</th>
+                            <th>Stock Level</th>
+                            <th>Price (₦)</th>
+                            <th>Value (₦)</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTableBody">
+                        <!-- Loaded via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="table-footer">
+                <div class="pagination-info" id="inventoryPaginationInfo">
+                    Showing 1-10 of 156 products
+                </div>
+                <div class="pagination">
+                    <button class="pagination-prev" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>4</button>
+                    <button>5</button>
+                    <span>...</span>
+                    <button>16</button>
+                    <button class="pagination-next">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Update Stock Modal -->
+    <div class="modal-overlay" id="updateStockModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="updateStockModalTitle">Update Stock Level</h3>
+                <button class="modal-close" onclick="closeModal('updateStockModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateStockForm">
+                    <input type="hidden" id="updateProductId">
+                    <div class="product-info-summary" id="productInfoSummary">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                    <div class="form-group">
+                        <label for="currentStock">Current Stock</label>
+                        <input type="number" id="currentStock" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="newStock">New Stock Level *</label>
+                        <input type="number" id="newStock" name="stock_quantity" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stockAction">Action Type</label>
+                        <select id="stockAction" name="action" onchange="onStockActionChange()">
+                            <option value="set">Set to exact quantity</option>
+                            <option value="add">Add stock</option>
+                            <option value="remove">Remove stock</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="stockAdjustmentAmount" style="display: none;">
+                        <label for="adjustmentAmount">Adjustment Amount</label>
+                        <input type="number" id="adjustmentAmount" name="adjustment" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="stockNotes">Notes</label>
+                        <textarea id="stockNotes" name="notes" rows="3" placeholder="e.g., Received new shipment, Returned items, etc."></textarea>
+                    </div>
+                    <div class="form-group toggle-group">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="notifyCustomer" name="notify_customer" class="toggle-input">
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">Notify customers when back in stock</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('updateStockModal')">Cancel</button>
+                <button class="btn-primary" onclick="saveStockUpdate()">
+                    <i class="fas fa-save"></i> Update Stock
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Update Stock Modal -->
+    <div class="modal-overlay" id="bulkUpdateStockModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Bulk Update Stock</h3>
+                <button class="modal-close" onclick="closeModal('bulkUpdateStockModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="bulk-update-info">
+                    <p><i class="fas fa-info-circle"></i> Selected <span id="selectedCount">0</span> product(s) for bulk update</p>
+                </div>
+                <form id="bulkUpdateStockForm">
+                    <div class="form-group">
+                        <label for="bulkStockAction">Action</label>
+                        <select id="bulkStockAction" name="action" onchange="onBulkStockActionChange()">
+                            <option value="set">Set to exact quantity</option>
+                            <option value="add">Add stock</option>
+                            <option value="remove">Remove stock</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="bulkStockValue">Quantity</label>
+                        <input type="number" id="bulkStockValue" name="quantity" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="bulkStockNotes">Notes</label>
+                        <textarea id="bulkStockNotes" name="notes" rows="3" placeholder="Reason for bulk update"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('bulkUpdateStockModal')">Cancel</button>
+                <button class="btn-primary" onclick="applyBulkStockUpdate()">
+                    <i class="fas fa-check"></i> Apply to All
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restock Alert Modal -->
+    <div class="modal-overlay" id="restockAlertModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Set Restock Alert</h3>
+                <button class="modal-close" onclick="closeModal('restockAlertModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="restockAlertForm">
+                    <input type="hidden" id="alertProductId">
+                    <div class="product-info-summary" id="alertProductInfo">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                    <div class="form-group">
+                        <label for="restockThreshold">Restock Threshold</label>
+                        <input type="number" id="restockThreshold" name="threshold" min="1" value="10">
+                        <p class="hint">You will be alerted when stock falls below this number</p>
+                    </div>
+                    <div class="form-group">
+                        <label for="restockQuantity">Suggested Reorder Quantity</label>
+                        <input type="number" id="restockQuantity" name="reorder_quantity" min="1" value="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="supplier">Preferred Supplier</label>
+                        <select id="supplier" name="supplier">
+                            <option value="">Select Supplier</option>
+                            <option value="supplier1">Premium Apparel Ltd.</option>
+                            <option value="supplier2">Nigeria Textiles Co.</option>
+                            <option value="supplier3">International Fashion Group</option>
+                            <option value="supplier4">Local Artisans Collective</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('restockAlertModal')">Cancel</button>
+                <button class="btn-primary" onclick="setRestockAlert()">
+                    <i class="fas fa-bell"></i> Set Alert
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock History Modal -->
+    <div class="modal-overlay" id="stockHistoryModal">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Stock History</h3>
+                <button class="modal-close" onclick="closeModal('stockHistoryModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="product-info-summary" id="historyProductInfo">
+                    <!-- Loaded via JavaScript -->
+                </div>
+                <div class="stock-history-chart-container">
+                    <canvas id="stockHistoryChart"></canvas>
+                </div>
+                <div class="stock-history-table-container">
+                    <table class="stock-history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Action</th>
+                                <th>Previous</th>
+                                <th>Change</th>
+                                <th>New Stock</th>
+                                <th>Notes</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockHistoryTableBody">
+                            <!-- Loaded via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('stockHistoryModal')">Close</button>
+                <button class="btn-primary" onclick="exportStockHistory()">
+                    <i class="fas fa-download"></i> Export History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Stock Modal -->
+    <div class="modal-overlay" id="importStockModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Import Stock Levels</h3>
+                <button class="modal-close" onclick="closeModal('importStockModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="import-instructions">
+                    <p><i class="fas fa-file-excel"></i> Upload a CSV file with the following columns:</p>
+                    <ul>
+                        <li><strong>sku</strong> - Product SKU (required)</li>
+                        <li><strong>stock_quantity</strong> - New stock level (required)</li>
+                        <li><strong>notes</strong> - Update notes (optional)</li>
+                    </ul>
+                    <a href="#" onclick="downloadStockTemplate()" class="btn-link">
+                        <i class="fas fa-download"></i> Download Template
+                    </a>
+                </div>
+                <div class="form-group">
+                    <label for="stockImportFile">Select CSV File</label>
+                    <div class="file-upload-area">
+                        <input type="file" id="stockImportFile" accept=".csv" onchange="handleStockFileUpload()">
+                        <div class="file-upload-placeholder">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop or click to upload</p>
+                            <span class="file-types">CSV files only</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="import-preview" id="importPreview" style="display: none;">
+                    <h4>Preview Changes</h4>
+                    <div class="preview-table-container">
+                        <!-- Loaded via JavaScript -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('importStockModal')">Cancel</button>
+                <button class="btn-primary" onclick="processStockImport()" id="processImportBtn" disabled>
+                    <i class="fas fa-check"></i> Import Stock
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/inventory.js"></script>
+</body>
+</html>
